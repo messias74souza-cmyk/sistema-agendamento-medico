@@ -347,10 +347,54 @@ _Tecnologia & Humanização a serviço da sua saúde._"""
 # MÓDULO DE DADOS E PERSISTÊNCIA EM JSON (RESPONSABILIDADE DO ALUNO B)
 # =============================================================================
 
+CAMPOS_OBRIGATORIOS: set = {"id", "paciente", "telefone", "especialidade", "medico", "data", "horario"}
+
+
+def validar_estrutura_agendamento(agendamento: Dict[str, Any]) -> bool:
+    """
+    Valida se um registro de agendamento cumpre o contrato de dados (schema).
+    Garante a integridade dos dados lidos ou salvos no JSON.
+    
+    Args:
+        agendamento: Dicionário contendo os dados do agendamento.
+        
+    Returns:
+        bool: True se o schema for válido, False caso contrário.
+    """
+    if not isinstance(agendamento, dict):
+        return False
+    return CAMPOS_OBRIGATORIOS.issubset(agendamento.keys())
+
+
+def criar_backup_seguranca(caminho_arquivo: str = ARQUIVO_BANCO) -> bool:
+    """
+    Cria uma cópia de segurança preventiva da base de dados antes de operações críticas.
+    
+    Args:
+        caminho_arquivo: Caminho do arquivo JSON a ser protegido.
+        
+    Returns:
+        bool: True se o backup foi criado ou se o arquivo ainda não existia.
+    """
+    if not os.path.exists(caminho_arquivo):
+        return True
+    try:
+        caminho_backup = f"{caminho_arquivo}.bak"
+        with open(caminho_arquivo, "r", encoding="utf-8") as origem:
+            conteudo = origem.read()
+        with open(caminho_backup, "w", encoding="utf-8") as destino:
+            destino.write(conteudo)
+        return True
+    except OSError as err:
+        print(f"\n{Cores.AMARELO}⚠️  [Aviso de Backup]: Não foi possível criar snapshot de segurança: {err}{Cores.RESET}")
+        return False
+
+
 def carregar_agendamentos(caminho_arquivo: str = ARQUIVO_BANCO) -> List[Dict[str, Any]]:
     """
     Lê o arquivo JSON com a base de agendamentos e retorna uma lista de dicionários.
-    Implementa tratamento preventivo contra arquivos ausentes ou corrompidos.
+    Implementa tratamento preventivo contra arquivos ausentes, vazios ou corrompidos,
+    além de higienização de integridade dos registros.
     
     Prompt Original Aluno B:
     "Crie duas funções em Python: uma para salvar uma lista de agendamentos em um
@@ -361,7 +405,7 @@ def carregar_agendamentos(caminho_arquivo: str = ARQUIVO_BANCO) -> List[Dict[str
         caminho_arquivo: Caminho do arquivo JSON no disco.
         
     Returns:
-        List[Dict[str, Any]]: Lista de agendamentos cadastrados.
+        List[Dict[str, Any]]: Lista de agendamentos válidos cadastrados.
     """
     if not os.path.exists(caminho_arquivo):
         # Se não existe, inicializa um arquivo vazio seguro
@@ -374,59 +418,99 @@ def carregar_agendamentos(caminho_arquivo: str = ARQUIVO_BANCO) -> List[Dict[str
             if not conteudo:
                 return []
             dados = json.loads(conteudo)
-            if isinstance(dados, list):
-                return dados
-            return []
-    except json.JSONDecodeError:
-        print(f"\n{Cores.VERMELHO}⚠️  [Aviso]: O arquivo '{caminho_arquivo}' continha formatação inválida.{Cores.RESET}")
-        print(f"{Cores.CINZA}Criando backup e reiniciando base de dados temporária.{Cores.RESET}")
+            
+            if not isinstance(dados, list):
+                print(f"\n{Cores.VERMELHO}⚠️  [Aviso]: Base de dados em formato incorreto. Reiniciando.{Cores.RESET}")
+                return []
+
+            # Sanitização e validação de schema de cada registro
+            agendamentos_validos = [
+                ag for ag in dados if validar_estrutura_agendamento(ag)
+            ]
+            return agendamentos_validos
+
+    except json.JSONDecodeError as err_json:
+        print(f"\n{Cores.VERMELHO}⚠️  [Erro de Parse JSON]: O arquivo '{caminho_arquivo}' continha sintaxe inválida ({err_json}).{Cores.RESET}")
+        print(f"{Cores.CINZA}Criando arquivo de contingência e reiniciando base limpa.{Cores.RESET}")
         try:
             os.rename(caminho_arquivo, f"{caminho_arquivo}.corrompido.bak")
         except OSError:
             pass
+        salvar_agendamentos([], caminho_arquivo)
+        return []
+    except PermissionError:
+        print(f"\n{Cores.VERMELHO}❌ [Permissão Negada]: Sem permissão de leitura para '{caminho_arquivo}'.{Cores.RESET}")
         return []
     except Exception as e:
-        print(f"\n{Cores.VERMELHO}⚠️  [Erro de Leitura]: Falha ao acessar {caminho_arquivo}: {e}{Cores.RESET}")
+        print(f"\n{Cores.VERMELHO}⚠️  [Erro Inesperado de Leitura]: Falha ao acessar {caminho_arquivo}: {e}{Cores.RESET}")
         return []
 
 
 def salvar_agendamentos(agendamentos: List[Dict[str, Any]], caminho_arquivo: str = ARQUIVO_BANCO) -> bool:
     """
-    Grava a lista de agendamentos de forma persistente no arquivo JSON.
+    Grava a lista de agendamentos de forma persistente e segura no arquivo JSON,
+    com suporte a criação de backup prévio e formatação legível (indent=4).
     
     Args:
-        agendamentos: Lista com os dicionários de agendamento.
+        agendamentos: Lista com os dicionários de agendamento a persistir.
         caminho_arquivo: Caminho do arquivo JSON no disco.
         
     Returns:
         bool: True caso tenha salvo com sucesso, False em caso de falha.
     """
+    # Cria cópia de segurança antes de sobrescrever
+    criar_backup_seguranca(caminho_arquivo)
+
     try:
         with open(caminho_arquivo, mode="w", encoding="utf-8") as f:
             json.dump(agendamentos, f, indent=4, ensure_ascii=False)
         return True
+    except PermissionError:
+        print(f"\n{Cores.VERMELHO}❌ [Erro de Permissão]: Sem permissão de escrita no arquivo '{caminho_arquivo}'.{Cores.RESET}")
+        return False
+    except OSError as err_io:
+        print(f"\n{Cores.VERMELHO}❌ [Erro de Disco/IO]: Falha ao gravar dados em '{caminho_arquivo}': {err_io}{Cores.RESET}")
+        return False
     except Exception as e:
-        print(f"\n{Cores.VERMELHO}❌ [Erro de Gravação]: Não foi possível salvar os dados: {e}{Cores.RESET}")
+        print(f"\n{Cores.VERMELHO}❌ [Erro Crítico de Gravação]: Não foi possível salvar os dados: {e}{Cores.RESET}")
         return False
 
 
-def excluir_agendamento(agendamentos: List[Dict[str, Any]], id_alvo: int) -> bool:
+def excluir_agendamento(agendamentos: List[Dict[str, Any]], id_alvo: int, caminho_arquivo: str = ARQUIVO_BANCO) -> bool:
     """
-    Remove um agendamento da lista pelo seu ID numérico e persiste a exclusão no JSON.
+    Remove um agendamento da lista pelo seu ID numérico e persiste imediatamente
+    a exclusão no arquivo JSON.
     
     Args:
         agendamentos: Lista atual de agendamentos em memória.
         id_alvo: ID do agendamento que se deseja remover.
+        caminho_arquivo: Caminho do arquivo JSON no disco.
         
     Returns:
-        bool: True se o item foi encontrado e excluído, False caso contrário.
+        bool: True se o item foi encontrado e excluído com sucesso, False caso contrário.
     """
     for index, ag in enumerate(agendamentos):
         if ag.get("id") == id_alvo:
             agendamentos.pop(index)
-            salvar_agendamentos(agendamentos)
-            return True
+            return salvar_agendamentos(agendamentos, caminho_arquivo)
     return False
+
+
+def buscar_agendamento_por_id(agendamentos: List[Dict[str, Any]], id_alvo: int) -> Optional[Dict[str, Any]]:
+    """
+    Recupera um agendamento específico da lista a partir do seu ID.
+    
+    Args:
+        agendamentos: Lista de agendamentos.
+        id_alvo: ID numérico buscado.
+        
+    Returns:
+        Optional[Dict[str, Any]]: Dicionário do agendamento ou None se não existir.
+    """
+    for ag in agendamentos:
+        if ag.get("id") == id_alvo:
+            return ag
+    return None
 
 
 # =============================================================================

@@ -1,1 +1,26 @@
-[]
+[
+    {
+        "id": 1,
+        "paciente": "Mariana Souza",
+        "telefone": "(11) 98765-4321",
+        "especialidade": "Cardiologia",
+        "medico": "Dr. Roberto Albuquerque (CRM 98452-SP)",
+        "data": "15/10/2026",
+        "horario": "09:30",
+        "observacoes": "Check-up cardiológico preventivo",
+        "criado_em": "05/10/2026 20:00:00",
+        "status": "Confirmada"
+    },
+    {
+        "id": 2,
+        "paciente": "Carlos Eduardo Lima",
+        "telefone": "(11) 91234-5678",
+        "especialidade": "Dermatologia",
+        "medico": "Dra. Beatriz Fontana (CRM 74125-SP)",
+        "data": "16/10/2026",
+        "horario": "14:00",
+        "observacoes": "Avaliação de rotina",
+        "criado_em": "05/10/2026 20:15:00",
+        "status": "Confirmada"
+    }
+]
