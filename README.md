@@ -43,9 +43,11 @@ sistema-agendamento-medico/
    - **Proteção contra Interrupções:** Captura de `KeyboardInterrupt` (`Ctrl+C`) e `EOFError` para encerramento elegante sem *stack traces* feios na tela.
 
 3. **Banco de Dados em Arquivo JSON (`Aluno B`)**:
-   - Leitura automática na inicialização e escrita a cada alteração.
-   - Tratamento com `try/except` para arquivos não encontrados ou corrompidos (com auto-recuperação e backup preventivo).
-   - Exclusão e cancelamento de consultas com dupla confirmação de segurança.
+   - Leitura automática na inicialização e escrita a cada alteração com o módulo `json`.
+   - Tratamento com `try/except` para arquivos não encontrados, vazios ou corrompidos (auto-recuperação com arquivo de contingência `.bak`).
+   - Validação de integridade de schema para cada registro (`id`, `paciente`, `telefone`, `especialidade`, `medico`, `data`, `horario`).
+   - Criação preventiva de cópia de segurança antes de operações de gravação e exclusão.
+   - Exclusão e cancelamento de consultas com sincronização atômica no arquivo `agendamentos.json`.
 
 4. **Gerador de Mensagem WhatsApp por IA (`Dupla`)**:
    - Geração automática de texto educado, claro e humanizado contendo identificador da consulta, profissional, horário, endereço da clínica e orientações pré-consulta.
