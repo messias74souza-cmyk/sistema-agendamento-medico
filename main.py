@@ -792,12 +792,12 @@ def fluxo_cancelar_consulta(agendamentos: List[Dict[str, Any]]) -> None:
 # PONTO DE ENTRADA PRINCIPAL DA APLICAÇÃO (MAIN)
 # =============================================================================
 
-def main() -> None:
-    """
-    Fluxo principal de controle do sistema de agendamento médico.
-    Carrega os dados persistidos, executa o loop do menu e trata interrupções
-    inesperadas para garantir que a aplicação nunca encerre abruptamente com erro.
-    """
+# =============================================================================
+# PONTO DE ENTRADA PRINCIPAL DA APLICAÇÃO (MAIN)
+# =============================================================================
+
+def executar_modo_terminal() -> None:
+    """Executa o sistema em modo terminal interativo (CLI)."""
     try:
         # Inicializa o carregamento dos agendamentos (Módulo Aluno B)
         agendamentos = carregar_agendamentos(ARQUIVO_BANCO)
@@ -832,5 +832,27 @@ def main() -> None:
         sys.exit(1)
 
 
+def main() -> None:
+    """
+    Ponto de entrada principal do projeto.
+    Executa prioritariamente o Painel Gráfico Profissional (Tkinter).
+    Permite alternar para modo terminal via argumento '--cli' ou em caso de ausência de display.
+    """
+    # Verifica se foi solicitado expressamente o modo terminal via linha de comando
+    if "--cli" in sys.argv or "--terminal" in sys.argv:
+        executar_modo_terminal()
+        return
+
+    # Execução padrão via Interface Gráfica Tkinter
+    try:
+        import app_gui
+        app_gui.iniciar_interface_grafica()
+    except Exception as err_gui:
+        # Fallback gracioso para terminal caso ambiente gráfico não esteja disponível
+        print(f"\n{Cores.AMARELO}ℹ️  Iniciando em modo terminal (CLI): {err_gui}{Cores.RESET}\n")
+        executar_modo_terminal()
+
+
 if __name__ == "__main__":
     main()
+

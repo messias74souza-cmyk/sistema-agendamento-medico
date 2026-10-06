@@ -21,7 +21,8 @@
 sistema-agendamento-medico/
 │── .gitignore             # Arquivos ignorados pelo controle de versão (Python, caches, etc.)
 │── agendamentos.json      # Banco de dados em texto simples estruturado (JSON)
-│── main.py                # Código principal do sistema (fluxo de execução, UX e regras de negócio)
+│── app_gui.py             # Interface Gráfica Profissional em Tkinter (Design Moderno & Intuitivo)
+│── main.py                # Código principal do sistema (inicializador híbrido GUI/CLI e regras)
 └── README.md              # Documentação técnica e guia colaborativo da aplicação
 ```
 
@@ -29,12 +30,18 @@ sistema-agendamento-medico/
 
 ## 🚀 Funcionalidades Principais
 
-1. **Painel Visual e UX Amigável (`Aluno A`)**:
+1. **Interface Gráfica Profissional (Tkinter GUI)**:
+   - Painel visual moderno em abas (*Tabs*): Novo Agendamento, Consultas Marcadas e WhatsApp.
+   - Pesquisa dinâmica em tempo real por nome do paciente, médico ou data.
+   - Botão de cópia direta da mensagem formatada para a área de transferência do Windows.
+   - Contador de consultas ativas no cabeçalho em tempo real.
+
+2. **Painel Visual e UX Amigável no Terminal (`Aluno A`)**:
    - Menus desenhados com divisores ASCII e emojis.
    - Navegação intuitiva com a opção de cancelar operações a qualquer momento digitando `0`.
    - Limpeza dinâmica de tela para transições suaves entre menus.
 
-2. **Prevenção Ativa de Erros e Validações (`Aluno A`)**:
+3. **Prevenção Ativa de Erros e Validações (`Aluno A`)**:
    - **Validação de Menus:** Bloqueia caracteres inválidos, espaços vazios ou números fora do intervalo sem encerrar a aplicação.
    - **Validação de Datas:** Impede datas passadas e formatos inválidos através de conversão com `datetime` (`DD/MM/AAAA`).
    - **Validação de Horários:** Restringe o atendimento ao horário comercial da clínica (07:00 às 19:00).
@@ -42,14 +49,14 @@ sistema-agendamento-medico/
    - **Validação de Telefone:** Formatação e conferência de dígitos com DDD para telefones brasileiros (`(XX) 9XXXX-XXXX`).
    - **Proteção contra Interrupções:** Captura de `KeyboardInterrupt` (`Ctrl+C`) e `EOFError` para encerramento elegante sem *stack traces* feios na tela.
 
-3. **Banco de Dados em Arquivo JSON (`Aluno B`)**:
+4. **Banco de Dados em Arquivo JSON (`Aluno B`)**:
    - Leitura automática na inicialização e escrita a cada alteração com o módulo `json`.
    - Tratamento com `try/except` para arquivos não encontrados, vazios ou corrompidos (auto-recuperação com arquivo de contingência `.bak`).
    - Validação de integridade de schema para cada registro (`id`, `paciente`, `telefone`, `especialidade`, `medico`, `data`, `horario`).
    - Criação preventiva de cópia de segurança antes de operações de gravação e exclusão.
    - Exclusão e cancelamento de consultas com sincronização atômica no arquivo `agendamentos.json`.
 
-4. **Gerador de Mensagem WhatsApp por IA (`Dupla`)**:
+5. **Gerador de Mensagem WhatsApp por IA (`Dupla`)**:
    - Geração automática de texto educado, claro e humanizado contendo identificador da consulta, profissional, horário, endereço da clínica e orientações pré-consulta.
 
 ---
@@ -58,7 +65,7 @@ sistema-agendamento-medico/
 
 ### Pré-requisitos
 - **Python 3.10** ou superior instalado no computador.
-- Terminal compatível com caracteres UTF-8 (VS Code Terminal, PowerShell, Bash ou CMD).
+- Não requer instalação de nenhuma biblioteca externa (`tkinter` já vem embutido nativamente no Python).
 
 ### Passo a Passo
 
@@ -68,9 +75,14 @@ sistema-agendamento-medico/
    cd sistema-agendamento-medico
    ```
 
-2. **Execute o programa principal:**
+2. **Execute o programa principal (Abre a Interface Gráfica Tkinter por padrão):**
    ```bash
    python main.py
+   ```
+
+3. *(Opcional)* **Executar em modo Terminal / CLI:**
+   ```bash
+   python main.py --cli
    ```
 
 ---
