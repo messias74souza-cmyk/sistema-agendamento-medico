@@ -64,7 +64,7 @@ sistema-agendamento-medico/
 
 1. **Clone o repositório ou abra a pasta do projeto no VS Code:**
    ```bash
-   git clone https://github.com/<usuario-aluno-a>/sistema-agendamento-medico.git
+   git clone https://github.com/messias74souza-cmyk/sistema-agendamento-medico.git
    cd sistema-agendamento-medico
    ```
 
