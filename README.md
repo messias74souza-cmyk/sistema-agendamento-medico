@@ -22,6 +22,8 @@ sistema-agendamento-medico/
 │── .gitignore             # Arquivos ignorados pelo controle de versão (Python, caches, etc.)
 │── agendamentos.json      # Banco de dados em texto simples estruturado (JSON)
 │── app_gui.py             # Interface Gráfica Profissional em Tkinter (Design Moderno & Intuitivo)
+│── painel.pyw             # Launcher Desktop nativo (abre a janela do painel diretamente sem terminal)
+│── Abrir_Painel.bat       # Atalho executável de 1 clique para abrir o painel gráfico no Windows
 │── main.py                # Código principal do sistema (inicializador híbrido GUI/CLI e regras)
 └── README.md              # Documentação técnica e guia colaborativo da aplicação
 ```
@@ -75,12 +77,15 @@ sistema-agendamento-medico/
    cd sistema-agendamento-medico
    ```
 
-2. **Execute o programa principal (Abre a Interface Gráfica Tkinter por padrão):**
-   ```bash
-   python main.py
-   ```
+2. **Abrir o Painel Gráfico Diretamente (Desktop / Janela Própria):**
+   - **Opção A (Atalho de 1 clique no Windows):** Dê um duplo clique no arquivo `Abrir_Painel.bat`.
+   - **Opção B (Sem terminal de fundo):** Dê um duplo clique ou execute `painel.pyw`.
+   - **Opção C (Pelo Terminal do VS Code):**
+     ```bash
+     python main.py
+     ```
 
-3. *(Opcional)* **Executar em modo Terminal / CLI:**
+3. *(Opcional)* **Executar em modo Terminal / CLI (Para avaliação clássica):**
    ```bash
    python main.py --cli
    ```

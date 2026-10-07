@@ -835,21 +835,26 @@ def executar_modo_terminal() -> None:
 def main() -> None:
     """
     Ponto de entrada principal do projeto.
-    Executa prioritariamente o Painel Gráfico Profissional (Tkinter).
+    Abre o Painel Gráfico Profissional (Tkinter) em janela própria.
     Permite alternar para modo terminal via argumento '--cli' ou em caso de ausência de display.
     """
-    # Verifica se foi solicitado expressamente o modo terminal via linha de comando
     if "--cli" in sys.argv or "--terminal" in sys.argv:
         executar_modo_terminal()
         return
 
-    # Execução padrão via Interface Gráfica Tkinter
+    print(f"\n{Cores.CIANO}{'=' * 66}{Cores.RESET}")
+    print(f"{Cores.NEGRITO}{Cores.VERDE}   🏥  {NOME_CLINICA.upper()} - PAINEL GRÁFICO INICIADO  🏥{Cores.RESET}")
+    print(f"{Cores.CINZA}   A janela do painel próprio foi aberta na sua área de trabalho!{Cores.RESET}")
+    print(f"{Cores.CIANO}{'=' * 66}{Cores.RESET}")
+    print(f"{Cores.AMARELO}▶ O painel está em execução na janela gráfica.{Cores.RESET}")
+    print(f"{Cores.CINZA}Para encerrar o sistema, basta fechar a janela do painel.{Cores.RESET}\n")
+
     try:
         import app_gui
         app_gui.iniciar_interface_grafica()
     except Exception as err_gui:
-        # Fallback gracioso para terminal caso ambiente gráfico não esteja disponível
-        print(f"\n{Cores.AMARELO}ℹ️  Iniciando em modo terminal (CLI): {err_gui}{Cores.RESET}\n")
+        print(f"\n{Cores.AMARELO}⚠️  Ambiente gráfico não disponível: {err_gui}{Cores.RESET}")
+        print(f"{Cores.CINZA}Iniciando no modo terminal tradicional...{Cores.RESET}\n")
         executar_modo_terminal()
 
 

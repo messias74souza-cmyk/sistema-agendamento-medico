@@ -25,9 +25,8 @@ class SistemaAgendamentoGUI:
 
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.root.title(f"{core.NOME_CLINICA} - Painel de Atendimento Inteligente")
-        self.root.geometry("1024x680")
-        self.root.minsize(900, 600)
+        self.root.title(f"🏥 {core.NOME_CLINICA} - Painel de Atendimento Inteligente")
+        self.root.minsize(960, 640)
         self.root.configure(bg="#f1f5f9")
 
         # Dados em memória
@@ -44,6 +43,25 @@ class SistemaAgendamentoGUI:
         # Carregamento inicial da tabela
         self.atualizar_tabela_consultas()
         self.atualizar_contador_badge()
+
+        # Posiciona e exibe a janela com destaque em primeiro plano
+        self.centralizar_e_destacar_janela()
+
+    def centralizar_e_destacar_janela(self, largura: int = 1060, altura: int = 700) -> None:
+        """Centraliza o painel na tela e força a abertura no primeiro plano do Windows."""
+        self.root.update_idletasks()
+        largura_tela = self.root.winfo_screenwidth()
+        altura_tela = self.root.winfo_screenheight()
+        pos_x = max(0, (largura_tela - largura) // 2)
+        pos_y = max(0, (altura_tela - altura) // 2)
+        self.root.geometry(f"{largura}x{altura}+{pos_x}+{pos_y}")
+
+        # Traz a janela para frente de outros aplicativos (como o VS Code)
+        self.root.deiconify()
+        self.root.lift()
+        self.root.attributes("-topmost", True)
+        self.root.after(300, lambda: self.root.attributes("-topmost", False))
+        self.root.focus_force()
 
     def setup_estilo(self) -> None:
         """Configura temas e estilos visuais para os componentes ttk."""
